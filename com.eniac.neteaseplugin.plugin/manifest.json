@@ -1,0 +1,495 @@
+{
+    "name": "NeteasePlugin",
+    "uuid": "com.eniac.neteaseplugin",
+    "version": "1.0.0",
+    "author": "ENIAC",
+    "entry": "backend/plugin.cjs",
+    "description": "网易云音乐控制面板 - 通过 BetterNCM + FlexLink 实现通信",
+    "repo": "https://github.com/ENIAC-Tech/NeteasePlugin.git",
+    "sdk": {
+        "version": "1.0.0"
+    },
+    "software": {
+        "minimumVersion": "1.0.0"
+    },
+    "os": [
+        {
+            "platform": "mac",
+            "minimumVersion": "10.15"
+        },
+        {
+            "platform": "windows",
+            "minimumVersion": "10"
+        }
+    ],
+    "device": [
+        {
+            "name": "flexbar",
+            "version": "1.0.0"
+        }
+    ],
+    "configPage": "configPage",
+    "keyLibrary": {
+        "title": "$PluginName",
+        "style": {
+            "icon": "data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAUQAAAFECAYAAABf6kfGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkI2NEU5QjVFOUMxODExRTVBOTQ4QUVENjdEMjBFRjNFIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkI2NEU5QjVGOUMxODExRTVBOTQ4QUVENjdEMjBFRjNFIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QjY0RTlCNUM5QzE4MTFFNUE5NDhBRUQ2N0QyMEVGM0UiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QjY0RTlCNUQ5QzE4MTFFNUE5NDhBRUQ2N0QyMEVGM0UiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7BM8AjAAA1a0lEQVR42uydB5gU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"
+        },
+        "children": [
+            {
+                "title": "$NowPlaying.Title",
+                "tip": "$NowPlaying.Tip",
+                "cid": "com.eniac.neteaseplugin.nowplaying",
+                "config": {
+                    "keyType": "default",
+                    "clickable": false,
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-music",
+                    "width": 600,
+                    "flags": ["disable-bg", "disable-fg", "disable-icon-sel", "disable-layout-sel"]
+                },
+                "data": {
+                    "showTitle": true,
+                    "showArtist": true,
+                    "showAlbum": true,
+                    "showProgress": true
+                }
+            },
+            {
+                "title": "$Lyric.Title",
+                "tip": "$Lyric.Tip",
+                "cid": "com.eniac.neteaseplugin.lyric",
+                "config": {
+                    "keyType": "default",
+                    "clickable": false,
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-text",
+                    "width": 480,
+                    "flags": ["disable-bg", "disable-fg", "disable-icon-sel", "disable-layout-sel"]
+                },
+                "data": {
+                    "showTranslation": true,
+                    "highlightWord": true,
+                    "backgroundColor": "#1a1a1a",
+                    "primaryAlign": "left",
+                    "primaryFontSize": 26,
+                    "primaryColor": "#FFFFFF",
+                    "highlightColor": "#C81919",
+                    "primaryPaddingTop": 1,
+                    "secondaryAlign": "left",
+                    "secondaryFontSize": 22,
+                    "secondaryColor": "#A0A0A0",
+                    "secondaryPaddingTop": 30,
+                    "paddingHorizontal": 10
+                }
+            },
+            {
+                "title": "$PlayMode.Title",
+                "tip": "$PlayMode.Tip",
+                "cid": "com.eniac.neteaseplugin.playmode",
+                "config": {
+                    "keyType": "multiState",
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-playlist-music",
+                    "width": 240,
+                    "multiStyle": [
+                        {
+                            "icon": "mdi mdi-playlist-music",
+                            "fgColor": "#FFFFFF",
+                            "title": "$PlayMode.Sequential"
+                        },
+                        {
+                            "icon": "mdi mdi-repeat",
+                            "fgColor": "#FFFFFF",
+                            "title": "$PlayMode.ListLoop"
+                        },
+                        {
+                            "icon": "mdi mdi-repeat-once",
+                            "fgColor": "#FFFFFF",
+                            "title": "$PlayMode.SingleLoop"
+                        },
+                        {
+                            "icon": "mdi mdi-shuffle",
+                            "fgColor": "#FFFFFF",
+                            "title": "$PlayMode.Shuffle"
+                        }
+                    ]
+                },
+                "data": {}
+            },
+            {
+                "title": "$Previous.Title",
+                "tip": "$Previous.Tip",
+                "cid": "com.eniac.neteaseplugin.previous",
+                "config": {
+                    "keyType": "default",
+                    "clickable": true,
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-skip-previous",
+                    "width": 240
+                },
+                "data": {}
+            },
+            {
+                "title": "$Next.Title",
+                "tip": "$Next.Tip",
+                "cid": "com.eniac.neteaseplugin.next",
+                "config": {
+                    "keyType": "default",
+                    "clickable": true,
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-skip-next",
+                    "width": 240
+                },
+                "data": {}
+            },
+            {
+                "title": "$PlayPause.Title",
+                "tip": "$PlayPause.Tip",
+                "cid": "com.eniac.neteaseplugin.playpause",
+                "config": {
+                    "keyType": "multiState",
+                    "platform": ["windows", "mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-play",
+                    "width": 240,
+                    "multiStyle": [
+                        {
+                            "icon": "mdi mdi-play",
+                            "fgColor": "#FFFFFF"
+                        },
+                        {
+                            "icon": "mdi mdi-pause",
+                            "fgColor": "#E60026"
+                        }
+                    ]
+                },
+                "data": {}
+            }
+        ]
+    },
+    "local": {
+        "en": {
+            "PluginName": "Netease Music",
+            "Config": {
+                "Title": "Netease Music Setup",
+                "Step1": {
+                    "Title": "Install Netease Music",
+                    "Description": "First, you need to install Netease Cloud Music desktop client (version 3.0+).",
+                    "Instructions": "1. Download the latest version of Netease Cloud Music\n2. Install it on your computer\n3. Make sure the version is 3.0 or higher",
+                    "Button": "Download Netease Music"
+                },
+                "Step2": {
+                    "Title": "Install BetterNCM",
+                    "Description": "BetterNCM is a plugin manager for Netease Cloud Music that allows you to extend its functionality.",
+                    "Instructions": "1. Visit the BetterNCM website\n2. Download the BetterNCM Installer\n3. Run the installer and follow the prompts\n4. Restart Netease Cloud Music after installation",
+                    "Button": "Open BetterNCM Website"
+                },
+                "Step3": {
+                    "Title": "Install FlexLink Plugin",
+                    "Description": "Click the button below to install the FlexLink plugin to the BetterNCM plugins folder.",
+                    "Button": "Install Plugin",
+                    "Idle": "Click the button to start installation",
+                    "Installing": "Installing plugin...",
+                    "Success": "Plugin installed successfully!",
+                    "Error": "Installation failed"
+                },
+                "Step4": {
+                    "Title": "Restart Netease Music",
+                    "Description": "Please restart Netease Cloud Music to load the newly installed plugin.",
+                    "Instructions": "1. Close Netease Cloud Music completely\n2. Reopen Netease Cloud Music\n3. The FlexLink plugin will be loaded automatically"
+                },
+                "Step5": {
+                    "Title": "Test Connection",
+                    "Description": "Verify that the plugin can connect to Netease Cloud Music.",
+                    "Button": "Test Connection",
+                    "Idle": "Click to test connection",
+                    "Testing": "Testing connection...",
+                    "Connected": "Connected successfully",
+                    "NotConnected": "Not connected. Please make sure Netease Music is running."
+                },
+                "Next": "Next",
+                "Back": "Back",
+                "Finish": "Finish",
+                "Complete": "Setup completed!"
+            },
+            "NowPlaying": {
+                "Title": "Now Playing",
+                "Tip": "Display current playback information",
+                "UI": {
+                    "ShowTitle": "Show Track Title",
+                    "ShowArtist": "Show Artist",
+                    "ShowAlbum": "Show Album",
+                    "ShowProgress": "Show Progress Bar"
+                }
+            },
+            "Lyric": {
+                "Title": "Lyrics",
+                "Tip": "Display synchronized lyrics with word-by-word highlight",
+                "UI": {
+                    "ShowTranslation": "Show Translation",
+                    "HighlightWord": "Word-by-word Highlight",
+                    "BackgroundColor": "Background Color",
+                    "Align": "Alignment",
+                    "AlignLeft": "Left",
+                    "AlignCenter": "Center",
+                    "AlignRight": "Right",
+                    "FontSize": "Font Size",
+                    "Primary": {
+                        "Title": "Current Lyric",
+                        "Color": "Text Color",
+                        "HighlightColor": "Highlight Color",
+                        "PaddingTop": "Distance from Top"
+                    },
+                    "Secondary": {
+                        "Title": "Translation / Next Line",
+                        "Color": "Text Color",
+                        "PaddingTop": "Distance from Top"
+                    },
+                    "Padding": {
+                        "Title": "Padding",
+                        "Horizontal": "Horizontal"
+                    }
+                }
+            },
+            "PlayMode": {
+                "Title": "Play Mode",
+                "Tip": "Toggle play mode (sequential/list loop/single loop/shuffle)",
+                "Sequential": "Sequential",
+                "ListLoop": "List Loop",
+                "SingleLoop": "Single Loop",
+                "Shuffle": "Shuffle"
+            },
+            "Previous": {
+                "Title": "Previous",
+                "Tip": "Play previous track"
+            },
+            "Next": {
+                "Title": "Next",
+                "Tip": "Play next track"
+            },
+            "PlayPause": {
+                "Title": "Play/Pause",
+                "Tip": "Toggle playback"
+            }
+        },
+        "zh-CN": {
+            "PluginName": "网易云音乐",
+            "Config": {
+                "Title": "网易云音乐设置",
+                "Step1": {
+                    "Title": "安装网易云音乐",
+                    "Description": "首先，您需要安装网易云音乐桌面客户端（版本 3.0+）。",
+                    "Instructions": "1. 下载最新版本的网易云音乐\n2. 在电脑上安装\n3. 确保版本为 3.0 或更高",
+                    "Button": "下载网易云音乐"
+                },
+                "Step2": {
+                    "Title": "安装 BetterNCM",
+                    "Description": "BetterNCM 是网易云音乐的插件管理器，可以扩展其功能。",
+                    "Instructions": "1. 访问 BetterNCM 官网\n2. 下载 BetterNCM 安装器\n3. 运行安装器并按提示操作\n4. 安装后重启网易云音乐",
+                    "Button": "打开 BetterNCM 官网"
+                },
+                "Step3": {
+                    "Title": "安装 FlexLink 插件",
+                    "Description": "点击下方按钮，将 FlexLink 插件安装到 BetterNCM 插件目录。",
+                    "Button": "一键安装插件",
+                    "Idle": "点击按钮开始安装",
+                    "Installing": "正在安装插件...",
+                    "Success": "插件安装成功！",
+                    "Error": "安装失败"
+                },
+                "Step4": {
+                    "Title": "重启网易云音乐",
+                    "Description": "请重启网易云音乐以加载新安装的插件。",
+                    "Instructions": "1. 完全关闭网易云音乐\n2. 重新打开网易云音乐\n3. FlexLink 插件将自动加载"
+                },
+                "Step5": {
+                    "Title": "连接测试",
+                    "Description": "验证插件是否能够连接到网易云音乐。",
+                    "Button": "测试连接",
+                    "Idle": "点击测试连接",
+                    "Testing": "正在测试连接...",
+                    "Connected": "连接成功",
+                    "NotConnected": "未连接。请确保网易云音乐正在运行。"
+                },
+                "Next": "下一步",
+                "Back": "上一步",
+                "Finish": "完成",
+                "Complete": "设置完成！"
+            },
+            "NowPlaying": {
+                "Title": "正在播放",
+                "Tip": "显示当前播放信息",
+                "UI": {
+                    "ShowTitle": "显示歌曲名称",
+                    "ShowArtist": "显示艺术家",
+                    "ShowAlbum": "显示专辑",
+                    "ShowProgress": "显示进度条"
+                }
+            },
+            "Lyric": {
+                "Title": "歌词",
+                "Tip": "显示同步歌词，支持逐词高亮",
+                "UI": {
+                    "ShowTranslation": "显示翻译",
+                    "HighlightWord": "逐词高亮",
+                    "BackgroundColor": "背景颜色",
+                    "Align": "对齐方式",
+                    "AlignLeft": "左对齐",
+                    "AlignCenter": "居中",
+                    "AlignRight": "右对齐",
+                    "FontSize": "字体大小",
+                    "Primary": {
+                        "Title": "当前歌词",
+                        "Color": "文字颜色",
+                        "HighlightColor": "高亮颜色",
+                        "PaddingTop": "距顶部距离"
+                    },
+                    "Secondary": {
+                        "Title": "翻译/下一行",
+                        "Color": "文字颜色",
+                        "PaddingTop": "距顶部距离"
+                    },
+                    "Padding": {
+                        "Title": "边距",
+                        "Horizontal": "左右边距"
+                    }
+                }
+            },
+            "PlayMode": {
+                "Title": "播放模式",
+                "Tip": "切换播放模式（顺序/列表循环/单曲循环/随机）",
+                "Sequential": "顺序",
+                "ListLoop": "列表循环",
+                "SingleLoop": "单曲循环",
+                "Shuffle": "随机"
+            },
+            "Previous": {
+                "Title": "上一曲",
+                "Tip": "播放上一首歌曲"
+            },
+            "Next": {
+                "Title": "下一曲",
+                "Tip": "播放下一首歌曲"
+            },
+            "PlayPause": {
+                "Title": "播放/暂停",
+                "Tip": "切换播放状态"
+            }
+        },
+        "ja": {
+            "PluginName": "网易云音楽",
+            "Config": {
+                "Title": "网易云音楽 設定",
+                "Step1": {
+                    "Title": "网易云音楽をインストール",
+                    "Description": "まず、网易云音楽デスクトップクライアント（バージョン3.0以上）をインストールする必要があります。",
+                    "Instructions": "1. 最新版の网易云音楽をダウンロード\n2. コンピューターにインストール\n3. バージョンが3.0以上であることを確認",
+                    "Button": "网易云音楽をダウンロード"
+                },
+                "Step2": {
+                    "Title": "BetterNCMをインストール",
+                    "Description": "BetterNCMは网易云音楽のプラグインマネージャーで、機能を拡張できます。",
+                    "Instructions": "1. BetterNCMのウェブサイトにアクセス\n2. BetterNCMインストーラーをダウンロード\n3. インストーラーを実行して指示に従う\n4. インストール後、网易云音楽を再起動",
+                    "Button": "BetterNCMウェブサイトを開く"
+                },
+                "Step3": {
+                    "Title": "FlexLinkプラグインをインストール",
+                    "Description": "下のボタンをクリックして、FlexLinkプラグインをBetterNCMプラグインフォルダにインストールします。",
+                    "Button": "プラグインをインストール",
+                    "Idle": "ボタンをクリックしてインストールを開始",
+                    "Installing": "プラグインをインストール中...",
+                    "Success": "プラグインのインストールに成功しました！",
+                    "Error": "インストールに失敗しました"
+                },
+                "Step4": {
+                    "Title": "网易云音楽を再起動",
+                    "Description": "新しくインストールしたプラグインをロードするために、网易云音楽を再起動してください。",
+                    "Instructions": "1. 网易云音楽を完全に閉じる\n2. 网易云音楽を再度開く\n3. FlexLinkプラグインが自動的にロードされます"
+                },
+                "Step5": {
+                    "Title": "接続テスト",
+                    "Description": "プラグインが网易云音楽に接続できることを確認します。",
+                    "Button": "接続をテスト",
+                    "Idle": "クリックして接続をテスト",
+                    "Testing": "接続をテスト中...",
+                    "Connected": "接続に成功しました",
+                    "NotConnected": "接続されていません。网易云音楽が実行されていることを確認してください。"
+                },
+                "Next": "次へ",
+                "Back": "戻る",
+                "Finish": "完了",
+                "Complete": "設定が完了しました！"
+            },
+            "NowPlaying": {
+                "Title": "再生中",
+                "Tip": "現在の再生情報を表示",
+                "UI": {
+                    "ShowTitle": "曲名を表示",
+                    "ShowArtist": "アーティストを表示",
+                    "ShowAlbum": "アルバムを表示",
+                    "ShowProgress": "進行バーを表示"
+                }
+            },
+            "Lyric": {
+                "Title": "歌詞",
+                "Tip": "同期歌詞を表示（単語ハイライト対応）",
+                "UI": {
+                    "ShowTranslation": "翻訳を表示",
+                    "HighlightWord": "単語ハイライト",
+                    "BackgroundColor": "背景色",
+                    "Align": "配置",
+                    "AlignLeft": "左揃え",
+                    "AlignCenter": "中央揃え",
+                    "AlignRight": "右揃え",
+                    "FontSize": "フォントサイズ",
+                    "Primary": {
+                        "Title": "現在の歌詞",
+                        "Color": "文字色",
+                        "HighlightColor": "ハイライト色",
+                        "PaddingTop": "上からの距離"
+                    },
+                    "Secondary": {
+                        "Title": "翻訳/次の行",
+                        "Color": "文字色",
+                        "PaddingTop": "上からの距離"
+                    },
+                    "Padding": {
+                        "Title": "余白",
+                        "Horizontal": "左右"
+                    }
+                }
+            },
+            "PlayMode": {
+                "Title": "再生モード",
+                "Tip": "再生モードを切り替え（順番/リスト/1曲/シャッフル）",
+                "Sequential": "順番",
+                "ListLoop": "リスト",
+                "SingleLoop": "1曲",
+                "Shuffle": "シャッフル"
+            },
+            "Previous": {
+                "Title": "前の曲",
+                "Tip": "前の曲を再生"
+            },
+            "Next": {
+                "Title": "次の曲",
+                "Tip": "次の曲を再生"
+            },
+            "PlayPause": {
+                "Title": "再生/一時停止",
+                "Tip": "再生を切り替え"
+            }
+        }
+    }
+}
