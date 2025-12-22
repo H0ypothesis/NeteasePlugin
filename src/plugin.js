@@ -518,6 +518,10 @@ plugin.on('ui.message', async (payload) => {
     
     switch (payload.action) {
         case 'getConnectionStatus':
+            // 如果未连接，先尝试连接
+            if (!isConnected) {
+                connectWebSocket();
+            }
             return {
                 connected: isConnected,
                 currentSong: currentState.song?.songName || null
