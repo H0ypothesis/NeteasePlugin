@@ -1,0 +1,2 @@
+# 编译产物（由 start.sh 自动重建，不入库）
+vendor/mediaremote-adapter/build/
