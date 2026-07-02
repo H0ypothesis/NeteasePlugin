@@ -2,6 +2,11 @@
 
 让 FlexBar 的 **NeteasePlugin** 在 **macOS** 上也能连上网易云音乐。
 
+> **⚠️ 现在通常不需要它了。** macOS 支持已**内置进插件后端**（见仓库根 `README.md`）：装上插件即可，
+> 无需再单独运行本服务、也无需 LaunchAgent。本目录保留为**可选/旧方案**，仅用于：本地调试、
+> 重建 `MediaRemoteAdapter.framework`，或在不想让 FlexDesigner 进程读取 MediaRemote 时作为外部数据源。
+> 与内置版逻辑等价（`server.js` 即 `src/mac-source.js` 的独立 WebSocket 服务端版本）。
+
 ## 背景：为什么需要它
 
 FlexBar 插件本身只是一个 WebSocket **客户端**，它连接 `ws://127.0.0.1:35010`，

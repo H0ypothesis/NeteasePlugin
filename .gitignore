@@ -3,4 +3,6 @@ logs
 .vscode
 .env
 package-lock.json
-com.eniac.neteaseplugin.plugin/backend
+com.h0ypothesis.neteaseplugin.mac.plugin/backend
+.DS_Store
+*.flexplugin

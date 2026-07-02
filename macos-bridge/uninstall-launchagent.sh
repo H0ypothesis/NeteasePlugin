@@ -4,7 +4,7 @@
 #
 set -euo pipefail
 
-LABEL="com.eniac.neteaseplugin.bridge"
+LABEL="com.h0ypothesis.neteaseplugin.mac.bridge"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 UID_NUM="$(id -u)"
 

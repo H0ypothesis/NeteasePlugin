@@ -2,22 +2,53 @@
  * Netease Music Plugin for FlexDesigner
  */
 
-const { plugin, logger, pluginPath } = require("@eniac/flexdesigner");
+const flexdesigner = require("@eniac/flexdesigner");
+const { plugin, logger, pluginPath, resourcesPath } = flexdesigner;
 const WebSocket = require('ws');
 const CanvasRenderer = require('./canvas-renderer');
 const LyricRenderer = require('./lyric-renderer');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const { createMacSource } = require('./mac-source');
 
 // ============================================================================
-// WebSocket 连接管理
+// 数据源
+// ----------------------------------------------------------------------------
+// 插件本身在两种平台上取数方式不同：
+//   - Windows：连接由 BetterNCM 注入网易云的 FlexLink（WebSocket 服务端，端口 35010）。
+//   - macOS ：无 FlexLink。改用内置的 MediaRemote 数据源（mac-source.js）——它直接
+//             在本插件进程内读取系统「正在播放」并拉取歌词，无需任何外部桥接进程。
+// 两条路径最终产生相同结构的消息，交由同一套 handleWebSocketMessage / 渲染逻辑处理。
 // ============================================================================
 
 const WS_URL = 'ws://127.0.0.1:35010';
 let ws = null;
 let reconnectTimer = null;
 let isConnected = false;
+
+// macOS 内置数据源实例（仅 darwin 且资源完整时启用）
+let macSource = null;
+
+// 解析随插件打包的资源目录（含 mediaremote/ 框架）。
+function resolveResourcesDir() {
+    const candidates = [];
+    if (typeof resourcesPath === 'string' && resourcesPath) candidates.push(resourcesPath);
+    if (typeof __dirname === 'string') candidates.push(path.join(__dirname, '..', 'resources'));
+    if (typeof pluginPath === 'string' && pluginPath) candidates.push(path.join(pluginPath, 'resources'));
+    for (const c of candidates) {
+        try {
+            if (fs.existsSync(path.join(c, 'mediaremote', 'MediaRemoteAdapter.framework'))) return c;
+        } catch (_) { /* ignore */ }
+    }
+    return candidates[0] || null;
+}
+
+const RESOURCES_DIR = resolveResourcesDir();
+const NATIVE_MAC =
+    process.platform === 'darwin' &&
+    !!RESOURCES_DIR &&
+    fs.existsSync(path.join(RESOURCES_DIR, 'mediaremote', 'MediaRemoteAdapter.framework'));
 
 // 当前播放状态
 let currentState = {
@@ -45,6 +76,25 @@ const lyricRenderer = new LyricRenderer(logger);
 // ============================================================================
 // WebSocket 连接
 // ============================================================================
+
+// 启动数据源：macOS 用内置 MediaRemote 源，其它平台连接 FlexLink(WebSocket)
+function startSource() {
+    if (NATIVE_MAC) {
+        if (macSource) return;
+        logger.info('[Plugin] 使用 macOS 内置 MediaRemote 数据源（无需外部桥接进程）');
+        const dbg = process.env.DEBUG ? (...a) => logger.info('[mac-source]', ...a) : () => {};
+        macSource = createMacSource({
+            emit: (msg) => handleWebSocketMessage(msg),
+            resourcesDir: RESOURCES_DIR,
+            log: (...a) => logger.info('[mac-source]', ...a),
+            debug: dbg,
+        });
+        isConnected = true;
+        macSource.start();
+        return;
+    }
+    connectWebSocket();
+}
 
 function connectWebSocket() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -100,6 +150,11 @@ function scheduleReconnect() {
 }
 
 function sendCommand(cmd) {
+    // macOS：命令交给内置数据源（媒体控制命令 / 应用内快捷键）
+    if (macSource) {
+        macSource.command(cmd);
+        return;
+    }
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(cmd));
         //  logger.info(`[Plugin] 发送命令: ${cmd.type}`);
@@ -188,8 +243,8 @@ async function updateDeviceKeys(serialNumber, keys) {
 async function updateTimelineKeys() {
     for (const [serialNumber, deviceData] of deviceKeys) {
         for (const [uid, key] of deviceData.keys) {
-            if (key.cid === 'com.eniac.neteaseplugin.nowplaying' ||
-                key.cid === 'com.eniac.neteaseplugin.lyric') {
+            if (key.cid === 'com.h0ypothesis.neteaseplugin.mac.nowplaying' ||
+                key.cid === 'com.h0ypothesis.neteaseplugin.mac.lyric') {
                 await updateKey(serialNumber, key);
             }
         }
@@ -199,7 +254,7 @@ async function updateTimelineKeys() {
 async function updateLyricKeys() {
     for (const [serialNumber, deviceData] of deviceKeys) {
         for (const [uid, key] of deviceData.keys) {
-            if (key.cid === 'com.eniac.neteaseplugin.lyric') {
+            if (key.cid === 'com.h0ypothesis.neteaseplugin.mac.lyric') {
                 await updateKey(serialNumber, key);
             }
         }
@@ -263,16 +318,16 @@ function stopLyricAnimation() {
 async function updateKey(serialNumber, key) {
     try {
         switch (key.cid) {
-            case 'com.eniac.neteaseplugin.nowplaying':
+            case 'com.h0ypothesis.neteaseplugin.mac.nowplaying':
                 await updateNowPlayingKey(serialNumber, key);
                 break;
-            case 'com.eniac.neteaseplugin.lyric':
+            case 'com.h0ypothesis.neteaseplugin.mac.lyric':
                 await updateLyricKey(serialNumber, key);
                 break;
-            case 'com.eniac.neteaseplugin.playpause':
+            case 'com.h0ypothesis.neteaseplugin.mac.playpause':
                 updatePlayPauseKey(serialNumber, key);
                 break;
-            case 'com.eniac.neteaseplugin.playmode':
+            case 'com.h0ypothesis.neteaseplugin.mac.playmode':
                 updatePlayModeKey(serialNumber, key);
                 break;
         }
@@ -389,17 +444,20 @@ async function handleKeyAction(serialNumber, key, currentKeyState) {
 
     try {
         switch (key.cid) {
-            case 'com.eniac.neteaseplugin.playpause':
+            case 'com.h0ypothesis.neteaseplugin.mac.playpause':
                 await handlePlayPause(serialNumber, key);
                 break;
-            case 'com.eniac.neteaseplugin.playmode':
+            case 'com.h0ypothesis.neteaseplugin.mac.playmode':
                 await handlePlayMode(serialNumber, key);
                 break;
-            case 'com.eniac.neteaseplugin.previous':
+            case 'com.h0ypothesis.neteaseplugin.mac.previous':
                 sendCommand({ type: 'PreviousSong' });
                 break;
-            case 'com.eniac.neteaseplugin.next':
+            case 'com.h0ypothesis.neteaseplugin.mac.next':
                 sendCommand({ type: 'NextSong' });
+                break;
+            case 'com.h0ypothesis.neteaseplugin.mac.like':
+                sendCommand({ type: 'Like' });
                 break;
         }
     } catch (err) {
@@ -440,8 +498,8 @@ function registerDevice(serialNumber, keys) {
         //  logger.info(`[Plugin] 按键注册: ${key.cid} (${key.uid})`);
     }
     
-    // 确保 WebSocket 连接
-    connectWebSocket();
+    // 确保数据源已启动（macOS 内置源 / Windows 的 FlexLink WebSocket）
+    startSource();
 }
 
 function unregisterDevice(serialNumber) {
@@ -463,6 +521,10 @@ function cleanupResources() {
     if (ws) {
         ws.close();
         ws = null;
+    }
+    if (macSource) {
+        macSource.stop();
+        macSource = null;
     }
     deviceKeys.clear();
     isConnected = false;
@@ -518,9 +580,9 @@ plugin.on('ui.message', async (payload) => {
     
     switch (payload.action) {
         case 'getConnectionStatus':
-            // 如果未连接，先尝试连接
+            // 如果未连接，先尝试启动数据源
             if (!isConnected) {
-                connectWebSocket();
+                startSource();
             }
             return {
                 connected: isConnected,

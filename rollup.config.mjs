@@ -6,7 +6,7 @@ import url from "node:url";
 import json from '@rollup/plugin-json';
 import { glob } from 'glob'
 const isWatching = !!process.env.ROLLUP_WATCH;
-const flexPlugin = "com.eniac.neteaseplugin.plugin";
+const flexPlugin = "com.h0ypothesis.neteaseplugin.mac.plugin";
 
 /**
  * @type {import('rollup').RollupOptions}

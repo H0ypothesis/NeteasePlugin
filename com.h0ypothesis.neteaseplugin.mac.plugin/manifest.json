@@ -1,11 +1,11 @@
 {
-    "name": "NeteasePlugin",
-    "uuid": "com.eniac.neteaseplugin",
+    "name": "NeteasePlugin-for-mac",
+    "uuid": "com.h0ypothesis.neteaseplugin.mac",
     "version": "1.0.0",
-    "author": "ENIAC",
+    "author": "H0ypothesis",
     "entry": "backend/plugin.cjs",
-    "description": "网易云音乐控制面板 - 通过 BetterNCM + FlexLink 实现通信",
-    "repo": "https://github.com/ENIAC-Tech/NeteasePlugin.git",
+    "description": "网易云音乐控制面板 - macOS 原生内置（无需额外服务）；Windows 经 BetterNCM + FlexLink",
+    "repo": "https://github.com/H0ypothesis/NeteasePlugin.git",
     "sdk": {
         "version": "1.0.0"
     },
@@ -38,7 +38,7 @@
             {
                 "title": "$NowPlaying.Title",
                 "tip": "$NowPlaying.Tip",
-                "cid": "com.eniac.neteaseplugin.nowplaying",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.nowplaying",
                 "config": {
                     "keyType": "default",
                     "clickable": false,
@@ -59,7 +59,7 @@
             {
                 "title": "$Lyric.Title",
                 "tip": "$Lyric.Tip",
-                "cid": "com.eniac.neteaseplugin.lyric",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.lyric",
                 "config": {
                     "keyType": "default",
                     "clickable": false,
@@ -89,7 +89,7 @@
             {
                 "title": "$PlayMode.Title",
                 "tip": "$PlayMode.Tip",
-                "cid": "com.eniac.neteaseplugin.playmode",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.playmode",
                 "config": {
                     "keyType": "multiState",
                     "platform": ["windows", "mac"]
@@ -125,7 +125,7 @@
             {
                 "title": "$Previous.Title",
                 "tip": "$Previous.Tip",
-                "cid": "com.eniac.neteaseplugin.previous",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.previous",
                 "config": {
                     "keyType": "default",
                     "clickable": true,
@@ -140,7 +140,7 @@
             {
                 "title": "$Next.Title",
                 "tip": "$Next.Tip",
-                "cid": "com.eniac.neteaseplugin.next",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.next",
                 "config": {
                     "keyType": "default",
                     "clickable": true,
@@ -155,7 +155,7 @@
             {
                 "title": "$PlayPause.Title",
                 "tip": "$PlayPause.Tip",
-                "cid": "com.eniac.neteaseplugin.playpause",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.playpause",
                 "config": {
                     "keyType": "multiState",
                     "platform": ["windows", "mac"]
@@ -173,6 +173,21 @@
                             "fgColor": "#E60026"
                         }
                     ]
+                },
+                "data": {}
+            },
+            {
+                "title": "$Like.Title",
+                "tip": "$Like.Tip",
+                "cid": "com.h0ypothesis.neteaseplugin.mac.like",
+                "config": {
+                    "keyType": "default",
+                    "clickable": true,
+                    "platform": ["mac"]
+                },
+                "style": {
+                    "icon": "mdi mdi-heart",
+                    "width": 240
                 },
                 "data": {}
             }
@@ -281,6 +296,10 @@
             "PlayPause": {
                 "Title": "Play/Pause",
                 "Tip": "Toggle playback"
+            },
+            "Like": {
+                "Title": "Like",
+                "Tip": "Like the current song (toggle ♥)"
             }
         },
         "zh-CN": {
@@ -385,6 +404,10 @@
             "PlayPause": {
                 "Title": "播放/暂停",
                 "Tip": "切换播放状态"
+            },
+            "Like": {
+                "Title": "喜欢",
+                "Tip": "喜欢当前歌曲（红心，再按取消）"
             }
         },
         "ja": {
@@ -489,6 +512,10 @@
             "PlayPause": {
                 "Title": "再生/一時停止",
                 "Tip": "再生を切り替え"
+            },
+            "Like": {
+                "Title": "いいね",
+                "Tip": "再生中の曲をいいね（♥、再押しで解除）"
             }
         }
     }

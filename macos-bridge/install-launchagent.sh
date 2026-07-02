@@ -7,7 +7,7 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT="$(cd "$DIR/.." && pwd)"
-LABEL="com.eniac.neteaseplugin.bridge"
+LABEL="com.h0ypothesis.neteaseplugin.mac.bridge"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 LOG="$HOME/Library/Logs/$LABEL.log"
 NODE="$(command -v node || true)"

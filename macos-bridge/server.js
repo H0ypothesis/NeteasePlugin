@@ -45,6 +45,14 @@ const WS_PORT = parseInt(process.env.NETEASE_WS_PORT || '35010', 10);
 // 只透传网易云的播放信息（设为空字符串可放行所有 App）。
 const ONLY_BUNDLE = process.env.NETEASE_ANY_APP ? null : 'com.netease.163music';
 
+// 网易云的 bundle id（用于 like 时临时激活窗口）
+const NETEASE_BUNDLE = 'com.netease.163music';
+// like 快捷键（网易云应用内默认 ⌘L），可用环境变量覆盖
+const LIKE_KEY = (process.env.NETEASE_LIKE_KEY || 'l').replace(/["\\]/g, '');
+const LIKE_MODS = process.env.NETEASE_LIKE_MODS || 'command'; // 逗号分隔: command,option,control,shift
+// 若已在网易云里设置了"全局快捷键"，置位此变量则不激活窗口、直接发键（无焦点闪烁）
+const LIKE_NO_ACTIVATE = !!process.env.NETEASE_LIKE_NO_ACTIVATE;
+
 const DEBUG = !!process.env.DEBUG;
 
 // mediaremote-adapter 路径
@@ -252,6 +260,9 @@ function handleClientCommand(msg, socket) {
         case 'TogglePlayMode':
             // 尽力而为：网易云通常不响应 MediaRemote 的循环/随机切换
             adapterSend(CMD.TOGGLE_REPEAT);
+            break;
+        case 'Like':
+            likeCurrentSong();
             break;
         default:
             debug('未知命令:', type);
@@ -550,6 +561,61 @@ function adapterSend(commandId) {
     });
     p.stderr.on('data', (d) => debug('send stderr:', d.toString().trim()));
     p.on('error', (err) => log('发送命令失败:', err.message));
+}
+
+// "喜欢"当前歌曲：网易云没有 MediaRemote 的 like 命令，这里用它应用内的快捷键(默认 ⌘L)。
+// 默认会临时把网易云激活到前台再发键，最后恢复原来的前台 App（因此即便 FlexBar/其它窗口
+// 在前台也能生效）。只用到 System Events，所以只需授权一次「辅助功能(Accessibility)」。
+function likeCurrentSong() {
+    const usingClause =
+        LIKE_MODS.trim().length > 0
+            ? ` using {${LIKE_MODS.split(',').map((m) => `${m.trim()} down`).join(', ')}}`
+            : '';
+
+    let lines;
+    if (LIKE_NO_ACTIVATE) {
+        // 全局快捷键模式：直接发键
+        lines = [`tell application "System Events" to keystroke "${LIKE_KEY}"${usingClause}`];
+    } else {
+        lines = [
+            `set bid to "${NETEASE_BUNDLE}"`,
+            `set prev to missing value`,
+            `tell application "System Events"`,
+            `  try`,
+            `    set prev to bundle identifier of (first application process whose frontmost is true)`,
+            `  end try`,
+            `  try`,
+            `    set frontmost of (first application process whose bundle identifier is bid) to true`,
+            `  end try`,
+            `end tell`,
+            `delay 0.12`,
+            `tell application "System Events" to keystroke "${LIKE_KEY}"${usingClause}`,
+            `delay 0.05`,
+            `if prev is not missing value and prev is not bid then`,
+            `  tell application "System Events"`,
+            `    try`,
+            `      set frontmost of (first application process whose bundle identifier is prev) to true`,
+            `    end try`,
+            `  end tell`,
+            `end if`,
+        ];
+    }
+
+    const args = [];
+    for (const ln of lines) args.push('-e', ln);
+
+    const p = spawn('/usr/bin/osascript', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    let err = '';
+    p.stderr.on('data', (d) => (err += d.toString()));
+    p.on('error', (e) => log('发送 like 快捷键失败:', e.message));
+    p.on('exit', (code) => {
+        if (code !== 0) {
+            log(`like 快捷键执行失败 (code=${code})。${err.trim()}`);
+            log('提示：需在「系统设置 → 隐私与安全性 → 辅助功能」中给运行本服务的程序授权。');
+        } else {
+            debug('已发送 like 快捷键');
+        }
+    });
 }
 
 // ============================================================================
