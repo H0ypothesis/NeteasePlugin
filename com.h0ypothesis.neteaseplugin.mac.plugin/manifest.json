@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "author": "H0ypothesis",
     "entry": "backend/plugin.cjs",
-    "description": "网易云音乐控制面板 - macOS 原生内置（无需额外服务）；Windows 经 BetterNCM + FlexLink",
+    "description": "网易云音乐控制面板 - macOS 经内置 macos-bridge 外部服务；Windows 经 BetterNCM + FlexLink",
     "repo": "https://github.com/H0ypothesis/NeteasePlugin.git",
     "sdk": {
         "version": "1.0.0"
