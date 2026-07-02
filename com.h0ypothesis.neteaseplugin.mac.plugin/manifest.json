@@ -195,7 +195,7 @@
     },
     "local": {
         "en": {
-            "PluginName": "Netease Music",
+            "PluginName": "Netease Music for Mac",
             "Config": {
                 "Title": "Netease Music Setup",
                 "Step1": {
@@ -303,7 +303,7 @@
             }
         },
         "zh-CN": {
-            "PluginName": "网易云音乐",
+            "PluginName": "网易云音乐 for Mac",
             "Config": {
                 "Title": "网易云音乐设置",
                 "Step1": {
@@ -411,7 +411,7 @@
             }
         },
         "ja": {
-            "PluginName": "网易云音楽",
+            "PluginName": "网易云音楽 for Mac",
             "Config": {
                 "Title": "网易云音楽 設定",
                 "Step1": {
