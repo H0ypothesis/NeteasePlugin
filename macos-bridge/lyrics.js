@@ -15,7 +15,24 @@ const https = require('https');
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36';
 const TIMEOUT_MS = 8000;
 
-function httpRequest(method, url, body) {
+// 证书链验证类错误：常见于用户开着带 TLS 中间人(MITM)的代理/VPN，
+// 其根证书未被 Node 信任。歌词接口是公开只读、无任何凭据，遇到这类错误
+// 降级为不校验证书重试一次即可，不影响安全。
+const TLS_ERR_CODES = new Set([
+    'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+    'UNABLE_TO_GET_ISSUER_CERT',
+    'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+    'SELF_SIGNED_CERT_IN_CHAIN',
+    'DEPTH_ZERO_SELF_SIGNED_CERT',
+    'CERT_UNTRUSTED',
+    'ERR_TLS_CERT_ALTNAME_INVALID',
+]);
+
+function isTlsCertError(err) {
+    return !!err && (TLS_ERR_CODES.has(err.code) || /certificate/i.test(err.message || ''));
+}
+
+function requestOnce(method, url, body, rejectUnauthorized) {
     return new Promise((resolve, reject) => {
         const u = new URL(url);
         const data = body || null;
@@ -24,6 +41,7 @@ function httpRequest(method, url, body) {
                 method,
                 hostname: u.hostname,
                 path: u.pathname + u.search,
+                rejectUnauthorized,
                 headers: {
                     'User-Agent': UA,
                     Referer: 'https://music.163.com/',
@@ -46,6 +64,18 @@ function httpRequest(method, url, body) {
         if (data) req.write(data);
         req.end();
     });
+}
+
+async function httpRequest(method, url, body) {
+    try {
+        return await requestOnce(method, url, body, true);
+    } catch (e) {
+        if (isTlsCertError(e)) {
+            // 代理的中间人证书不被信任 —— 降级重试一次
+            return await requestOnce(method, url, body, false);
+        }
+        throw e;
+    }
 }
 
 function normalize(s) {
