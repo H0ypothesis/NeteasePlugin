@@ -1,7 +1,7 @@
 {
     "name": "NeteasePlugin-for-mac",
     "uuid": "com.h0ypothesis.neteaseplugin.mac",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "author": "H0ypothesis",
     "entry": "backend/plugin.cjs",
     "description": "网易云音乐控制面板 - macOS 原生内置（无需额外服务）；Windows 经 BetterNCM + FlexLink",
